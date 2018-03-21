@@ -40,3 +40,10 @@ type (
 		Inserter
 	}
 )
+
+func NewMapDriver() StorageDriver {
+	var driver = new(mapDriver)
+
+	driver.store = make([]Document, 0, 100)
+	return driver
+}
