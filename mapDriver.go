@@ -120,3 +120,24 @@ func (d *mapDriver) Save(Query, Doc Document) error {
 
 	return nil
 }
+func (d *mapDriver) Remove(Query Document) error {
+	var match bool = true
+	d.Lock()
+	defer d.Unlock()
+	for docIndex, DBDoc := range d.store {
+		for k, v := range Query {
+			if val, ok := DBDoc[k]; !ok || val != v {
+				match = false
+				goto next
+			}
+		}
+		if match {
+			d.store = append(d.store[:docIndex], d.store[docIndex+1:]...)
+			return nil
+		}
+	next:
+		match = true
+	}
+
+	return fmt.Errorf("no document removed")
+}

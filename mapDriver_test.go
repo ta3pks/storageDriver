@@ -127,3 +127,20 @@ func Test_Save(t *testing.T) {
 	}
 
 }
+func Test_Remove(t *testing.T) {
+
+	d.store = make([]Document, 0)
+	for i := 0; i < 500; i++ {
+		d.Insert(Document{"num": i})
+	}
+
+	err := d.Remove(Document{"num": 10})
+	if nil != err {
+		t.Fatal("remove unsuccessful", err)
+	}
+
+	_, err = d.GetOne(Document{"num": 10})
+	if nil == err {
+		t.Fatal("remove doesnt remove values")
+	}
+}

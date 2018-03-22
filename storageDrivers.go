@@ -33,11 +33,16 @@ type (
 		InsertMulti(Docs []Document) error
 		InsertMultiNoFail(Docs []Document, ErrorOut ...io.Writer) []error
 	}
+	// Remover removes the document and returns an error if cannot remove
+	Remover interface {
+		Remove(Query Document) error
+	}
 	StorageDriver interface {
 		Saver
 		Getter
 		Updater
 		Inserter
+		Remover
 	}
 )
 
