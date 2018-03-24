@@ -1,4 +1,4 @@
-package storageDrivers
+package storageDriver
 
 import (
 	"fmt"
