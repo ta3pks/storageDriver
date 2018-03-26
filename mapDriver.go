@@ -3,6 +3,7 @@ package storageDriver
 import (
 	"fmt"
 	"io"
+	"reflect"
 	"sync"
 )
 
@@ -18,7 +19,7 @@ func (d *mapDriver) Get(Query Document) ([]Document, error) {
 	defer d.Unlock()
 	for _, DBDoc := range d.store {
 		for k, v := range Query {
-			if val, ok := DBDoc[k]; !ok || val != v {
+			if val, ok := DBDoc[k]; !ok || !reflect.DeepEqual(val, v) {
 				match = false
 				goto next
 			}
@@ -49,7 +50,7 @@ func (d *mapDriver) GetOne(Query Document) (Document, error) {
 	defer d.Unlock()
 	for _, DBDoc := range d.store {
 		for k, v := range Query {
-			if val, ok := DBDoc[k]; !ok || val != v {
+			if val, ok := DBDoc[k]; !ok || !reflect.DeepEqual(val, v) {
 				match = false
 				goto next
 			}
@@ -126,7 +127,7 @@ func (d *mapDriver) Remove(Query Document) error {
 	defer d.Unlock()
 	for docIndex, DBDoc := range d.store {
 		for k, v := range Query {
-			if val, ok := DBDoc[k]; !ok || val != v {
+			if val, ok := DBDoc[k]; !ok || !reflect.DeepEqual(val, v) {
 				match = false
 				goto next
 			}
