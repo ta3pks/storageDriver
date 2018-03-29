@@ -6,6 +6,18 @@ type (
 	//Document is general data structure where keys are string and values are anything you want as long as the underlaying driver supports it
 	Document = map[string]interface{}
 )
+
+//Meta contains the metaData
+type Meta interface {
+	//DB sets the db of to a given dbname
+	DB(dbname string) (Meta, error)
+	//Table changes table/collection of the meta
+	Table(colName string) (Meta, error)
+	//Clone returns a copy of previous meta which uses the same underlaying connection in most cases
+	Clone() Meta
+	//Driver returns the actual driver which can be later queried
+	Driver() (StorageDriver, error)
+}
 type (
 	//Saver inserts or updates data
 	Saver interface {
