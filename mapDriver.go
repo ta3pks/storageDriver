@@ -8,10 +8,38 @@ import (
 )
 
 type mapDriver struct {
+	database   string
+	collection string
 	sync.Mutex
 	store []Document
 }
 
+func (m *mapDriver) Driver() (StorageDriver, error) {
+	if d.database == "" || d.collection == "" {
+		return nil, fmt.Errorf("database or collection is not set")
+	}
+	return d, nil
+}
+func (m *mapDriver) DB(name string) error {
+	if name == "" {
+		return fmt.Errorf("empty name")
+	}
+	m.database = name
+	return nil
+}
+func (m *mapDriver) Table(name string) error {
+
+	if name == "" {
+		return fmt.Errorf("empty name")
+	}
+	m.collection = name
+	return nil
+}
+
+func (m *mapDriver) Clone() Meta {
+	var cpy = *m
+	return &cpy
+}
 func (d *mapDriver) Get(Query Document) ([]Document, error) {
 	var docs = make([]Document, 0)
 	var match bool = true
