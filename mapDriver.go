@@ -14,7 +14,7 @@ type mapDriver struct {
 	store map[string]map[string][]Document
 }
 
-func (m *mapDriver) Driver() (StorageDriver, error) {
+func (d *mapDriver) Driver() (StorageDriver, error) {
 	if d.database == "" || d.collection == "" {
 		return nil, fmt.Errorf("database or collection is not set")
 	}
