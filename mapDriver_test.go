@@ -7,7 +7,7 @@ import (
 var d = new(mapDriver)
 
 func Test_Insert(t *testing.T) {
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	d.Insert(Document{
 		"test": "test",
 	})
@@ -16,7 +16,7 @@ func Test_Insert(t *testing.T) {
 	}
 }
 func Test_Get(t *testing.T) {
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	for i := 0; i < 500; i++ {
 		d.Insert(Document{"num": i})
 	}
@@ -41,7 +41,7 @@ func Test_Get(t *testing.T) {
 	}
 }
 func Test_GetOne(t *testing.T) {
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	for i := 0; i < 500; i++ {
 		d.Insert(Document{"num": i})
 	}
@@ -58,13 +58,13 @@ func Test_GetOne(t *testing.T) {
 	}
 }
 func Test_Custom(t *testing.T) {
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	if _, err := d.Custom(Document{}); nil == err {
 		t.Fatal("this is not implemented yet")
 	}
 }
 func Test_Update(t *testing.T) {
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	for i := 0; i < 500; i++ {
 		d.Insert(Document{"num": i})
 	}
@@ -81,7 +81,7 @@ func Test_Update(t *testing.T) {
 }
 func Test_UpdateMulti(t *testing.T) {
 
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	for i := 0; i < 500; i++ {
 		d.Insert(Document{"num": 12})
 	}
@@ -102,7 +102,7 @@ func Test_UpdateMulti(t *testing.T) {
 }
 func Test_Save(t *testing.T) {
 
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	err := d.Save(Document{"num": 15}, Document{"test": 12})
 	if nil != err {
 		t.Fatal("save unsuccessful", err)
@@ -129,7 +129,7 @@ func Test_Save(t *testing.T) {
 }
 func Test_Remove(t *testing.T) {
 
-	d.store = make([]Document, 0)
+	d.store = make(map[string]map[string][]Document)
 	for i := 0; i < 500; i++ {
 		d.Insert(Document{"num": i})
 	}
