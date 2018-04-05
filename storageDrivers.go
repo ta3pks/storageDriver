@@ -10,9 +10,9 @@ type (
 //Meta contains the metaData
 type Meta interface {
 	//DB sets the db of to a given dbname
-	DB(dbname string) (Meta, error)
+	DB(dbname string) error
 	//Table changes table/collection of the meta
-	Table(colName string) (Meta, error)
+	Table(colName string) error
 	//Clone returns a copy of previous meta which uses the same underlaying connection in most cases
 	Clone() Meta
 	//Driver returns the actual driver which can be later queried
@@ -58,9 +58,8 @@ type (
 	}
 )
 
-func NewMapDriver() StorageDriver {
+func NewMapDriver() Meta {
 	var driver = new(mapDriver)
-
-	driver.store = make([]Document, 0, 100)
+	driver.store = make(map[string]map[string][]Document)
 	return driver
 }
