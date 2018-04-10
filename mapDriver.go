@@ -200,3 +200,9 @@ func (d *mapDriver) Remove(Query Document) error {
 
 	return fmt.Errorf("no document removed")
 }
+
+func NewMapDriver() Meta {
+	var driver = new(mapDriver)
+	driver.store = make(map[string]map[string][]Document)
+	return driver
+}
