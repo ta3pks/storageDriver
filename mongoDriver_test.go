@@ -22,6 +22,7 @@ func TestNewMongoDriver(t *testing.T) {
 		t.Fatal("missing protocol is supposed to give an error", err)
 	}
 }
+
 func TestDB(t *testing.T) {
 	var m Meta = new(mongoDriver)
 	if nil == m.DB("test") {
@@ -39,6 +40,7 @@ func TestDB(t *testing.T) {
 		t.Fatal("db cannot be nil")
 	}
 }
+
 func TestTable(t *testing.T) {
 	var m Meta = new(mongoDriver)
 	if nil == m.Table("test") {
@@ -62,6 +64,7 @@ func TestTable(t *testing.T) {
 		t.Fatal("col cannot be nil")
 	}
 }
+
 func TestClone(t *testing.T) {
 	m, err := NewMongoDriver("mongodb://localhost:27017")
 	if nil != err {
@@ -72,6 +75,7 @@ func TestClone(t *testing.T) {
 		t.Fatal("these two are supposed to be different addresses not the same")
 	}
 }
+
 func TestDriver(t *testing.T) {
 	m, err := NewMongoDriver("mongodb://localhost:27017")
 	_, err = m.Driver()
@@ -92,4 +96,56 @@ func TestDriver(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+}
+
+func TestInsert(t *testing.T) {
+	var d = getCleanDb()
+	if err := d.Insert(Document{"name": "nikos"}); nil != err {
+		t.Fatal(err)
+	}
+	var data = make(Document)
+	err := d.(*mongoDriver).col.Find(Document{"name": "nikos"}).One(data)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestInsertMulti(t *testing.T) {
+	var data = make([]Document, 100)
+	for i := range data {
+		data[i] = Document{"num": i, "key": "key"}
+	}
+
+	d := getCleanDb()
+	err := d.InsertMulti(data)
+	if nil != err {
+		t.Fatal(err)
+	}
+
+	var allData = make([]Document, 0)
+	err = d.(*mongoDriver).col.Find(Document{"key": "key"}).All(&allData)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(allData) != 100 {
+		t.Log(allData)
+		t.Fatal("invalid data")
+	}
+}
+func getCleanDb() StorageDriver {
+	d, err := NewMongoDriver("mongodb://localhost:27017")
+	if nil != err {
+		panic(err)
+	}
+	if err := d.DB("testingDB"); nil != err {
+		panic(err)
+	}
+	d.(*mongoDriver).db.DropDatabase()
+	d.DB("testingDB")
+	d.Table("testing")
+	drv, err := d.Driver()
+	if nil != err {
+		panic(err)
+	}
+	return drv
 }

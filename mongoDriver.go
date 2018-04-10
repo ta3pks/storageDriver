@@ -43,34 +43,56 @@ func (d *mongoDriver) Driver() (StorageDriver, error) {
 	return d, nil
 }
 func (d *mongoDriver) Save(Query, Doc Document) error {
-	return fmt.Errorf("not implemented")
+	_, err := d.col.Upsert(Query, Doc)
+	return err
 }
 func (d *mongoDriver) Get(query Document) ([]Document, error) {
-	return nil, fmt.Errorf("not implemented")
+	var docs = make([]Document, 0)
+	err := d.col.Find(query).All(docs)
+	return docs, err
 }
 func (d *mongoDriver) GetOne(query Document) (Document, error) {
-	return nil, fmt.Errorf("not implemented")
+	var doc = make(Document)
+	err := d.col.Find(query).One(doc)
+	return doc, err
 }
 func (d *mongoDriver) Custom(query interface{}) ([]Document, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 func (d *mongoDriver) Update(query, updateFields Document) error {
-	return fmt.Errorf("not implemented")
+	return d.col.Update(query, updateFields)
 }
 func (d *mongoDriver) UpdateMulti(query, updateFields Document) (int, error) {
-	return 0, fmt.Errorf("not implemented")
+	info, err := d.col.UpdateAll(query, updateFields)
+	if nil != info {
+		return info.Updated, err
+	}
+	return 0, err
 }
 func (d *mongoDriver) Insert(Doc Document) error {
-	return fmt.Errorf("not implemented")
+	return d.col.Insert(Doc)
 }
 func (d *mongoDriver) InsertMulti(docs []Document) error {
-	return fmt.Errorf("not implemented")
+	var dcs = make([]interface{}, len(docs))
+	for i := range docs {
+		dcs[i] = docs[i]
+	}
+	return d.col.Insert(dcs...)
 }
 func (d *mongoDriver) InsertMultiNoFail(docs []Document, ErrorOut ...io.Writer) []error {
-	return nil
+	var errs = make([]error, 0)
+	for _, doc := range docs {
+		if err := d.col.Insert(doc); nil != err {
+			errs = append(errs, err)
+			if len(ErrorOut) > 0 {
+				ErrorOut[0].Write([]byte(err.Error()))
+			}
+		}
+	}
+	return errs
 }
 func (d *mongoDriver) Remove(query Document) error {
-	return fmt.Errorf("not implemented")
+	return d.col.Remove(query)
 }
 func NewMongoDriver(addr string) (Meta, error) {
 	adrs, err := url.Parse(addr)
