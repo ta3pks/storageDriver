@@ -48,12 +48,12 @@ func (d *mongoDriver) Save(Query, Doc Document) error {
 }
 func (d *mongoDriver) Get(query Document) ([]Document, error) {
 	var docs = make([]Document, 0)
-	err := d.col.Find(query).All(docs)
+	err := d.col.Find(query).All(&docs)
 	return docs, err
 }
 func (d *mongoDriver) GetOne(query Document) (Document, error) {
 	var doc = make(Document)
-	err := d.col.Find(query).One(doc)
+	err := d.col.Find(query).One(&doc)
 	return doc, err
 }
 func (d *mongoDriver) Custom(query interface{}) ([]Document, error) {
