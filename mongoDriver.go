@@ -60,7 +60,7 @@ func (d *mongoDriver) Custom(query interface{}) ([]Document, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 func (d *mongoDriver) Update(query, updateFields Document) error {
-	return d.col.Update(query, updateFields)
+	return d.col.Update(query, Document{"$set": updateFields})
 }
 func (d *mongoDriver) UpdateMulti(query, updateFields Document) (int, error) {
 	info, err := d.col.UpdateAll(query, Document{"$set": updateFields})
