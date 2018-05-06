@@ -63,7 +63,7 @@ func (d *mongoDriver) Update(query, updateFields Document) error {
 	return d.col.Update(query, updateFields)
 }
 func (d *mongoDriver) UpdateMulti(query, updateFields Document) (int, error) {
-	info, err := d.col.UpdateAll(query, updateFields)
+	info, err := d.col.UpdateAll(query, Document{"$set": updateFields})
 	if nil != info {
 		return info.Updated, err
 	}
