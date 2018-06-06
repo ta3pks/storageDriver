@@ -43,7 +43,7 @@ func (d *mongoDriver) Driver() (StorageDriver, error) {
 	return d, nil
 }
 func (d *mongoDriver) Save(Query, Doc Document) error {
-	_, err := d.col.Upsert(Query, Doc)
+	_, err := d.col.Upsert(Query, Document{"$set": Doc})
 	return err
 }
 func (d *mongoDriver) Get(query Document) ([]Document, error) {
