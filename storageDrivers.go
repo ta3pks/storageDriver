@@ -7,6 +7,8 @@ type (
 	Document = map[string]interface{}
 )
 
+//TODO: must support type struct
+
 //Meta contains the metaData
 type Meta interface {
 	//DB sets the db of to a given dbname
