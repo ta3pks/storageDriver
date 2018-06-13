@@ -7,14 +7,23 @@ import (
 	"time"
 
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var defaultSession *mgo.Session
+
+type crs struct {
+	or    []interface{}
+	and   bson.M
+	queue []func()
+	q     *mgo.Query
+}
 
 type mongoDriver struct {
 	session *mgo.Session
 	db      *mgo.Database
 	col     *mgo.Collection
+	cursor  *crs
 }
 
 func (d *mongoDriver) DB(name string) error {
@@ -42,6 +51,100 @@ func (d *mongoDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
+
+func (d *mongoDriver) Cursor() Cursor {
+	d.cursor = new(crs)
+	d.cursor.and = bson.M{}
+	d.cursor.or = make([]interface{}, 0)
+	d.cursor.queue = make([]func(), 0)
+	return d
+}
+func (d *mongoDriver) And(Doc Document) Cursor {
+	for k, v := range Doc {
+		d.cursor.and[k] = v
+	}
+	return d
+}
+
+func (d *mongoDriver) Or(Doc []interface{}) Cursor {
+	d.cursor.or = append(d.cursor.or, Doc...)
+	return d
+}
+
+func (d *mongoDriver) Select(fields ...string) Cursor {
+	fieldMap := bson.M{"_id": 0}
+	for _, field := range fields {
+		fieldMap[field] = 1
+	}
+	fn := func() {
+		d.cursor.q.Select(fieldMap)
+	}
+	d.cursor.queue = append(d.cursor.queue, fn)
+	return d
+}
+
+func (d *mongoDriver) Sort(Doc ...string) Cursor {
+	fn := func() {
+		d.cursor.q.Sort(Doc...)
+	}
+	d.cursor.queue = append(d.cursor.queue, fn)
+	return d
+}
+
+func (d *mongoDriver) Limit(num int) Cursor {
+	fn := func() {
+		d.cursor.q.Limit(num)
+	}
+	d.cursor.queue = append(d.cursor.queue, fn)
+	return d
+}
+
+func (d *mongoDriver) Skip(num int) Cursor {
+	fn := func() {
+		d.cursor.q.Skip(num)
+	}
+	d.cursor.queue = append(d.cursor.queue, fn)
+	return d
+}
+
+func (d *mongoDriver) One(Doc interface{}) error {
+	q := getQuery(d.cursor.and, d.cursor.or)
+	d.cursor.q = d.col.Find(q)
+	for _, fn := range d.cursor.queue {
+		fn()
+	}
+	return d.cursor.q.One(Doc)
+}
+
+func (d *mongoDriver) Count(num *int) error {
+	q := getQuery(d.cursor.and, d.cursor.or)
+	d.cursor.q = d.col.Find(q)
+	for _, fn := range d.cursor.queue {
+		fn()
+	}
+	_num, err := d.cursor.q.Count()
+	*num = _num
+	return err
+}
+
+func (d *mongoDriver) All(Doc *[]interface{}) error {
+	q := getQuery(d.cursor.and, d.cursor.or)
+	d.cursor.q = d.col.Find(q)
+	for _, fn := range d.cursor.queue {
+		fn()
+	}
+	return d.cursor.q.All(Doc)
+}
+
+func (d *mongoDriver) Distinct(key string, result interface{}) error {
+	q := getQuery(d.cursor.and, d.cursor.or)
+	d.cursor.q = d.col.Find(q)
+	for _, fn := range d.cursor.queue {
+		fn()
+	}
+	return d.cursor.q.Distinct(key, result)
+}
+
 func (d *mongoDriver) Save(Query, Doc Document) error {
 	_, err := d.col.Upsert(Query, Document{"$set": Doc})
 	return err
@@ -110,4 +213,10 @@ func NewMongoDriver(addr string) (Meta, error) {
 	return &mongoDriver{
 		session: session,
 	}, nil
+}
+func getQuery(and Document, or []interface{}) Document {
+	if len(or) > 0 {
+		and["$or"] = or
+	}
+	return and
 }
