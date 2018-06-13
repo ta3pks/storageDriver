@@ -55,5 +55,30 @@ type (
 		Updater
 		Inserter
 		Remover
+		Cursor() Cursor
 	}
 )
+type Cursor interface {
+	And(Doc Document) Cursor
+	Or([]interface{}) Cursor
+	Select(fieldNames ...string) Cursor
+	Sort(Doc ...string) Cursor
+	One(Doc interface{}) error
+	Limit(num int) Cursor
+	Skip(num int) Cursor
+	All(Doc *[]interface{}) error
+	Count(num *int) error
+	Distinct(key string, result interface{}) error
+}
+type DummyCursor struct{}
+
+func (d DummyCursor) And(Doc Document) Cursor                       { return d }
+func (d DummyCursor) Or([]interface{}) Cursor                       { return d }
+func (d DummyCursor) Select(fieldNames ...string) Cursor            { return d }
+func (d DummyCursor) Sort(Doc ...string) Cursor                     { return d }
+func (d DummyCursor) One(Doc interface{}) error                     { return nil }
+func (d DummyCursor) Limit(num int) Cursor                          { return d }
+func (d DummyCursor) Skip(num int) Cursor                           { return d }
+func (d DummyCursor) All(Doc *[]interface{}) error                  { return nil }
+func (d DummyCursor) Count(num *int) error                          { return nil }
+func (d DummyCursor) Distinct(key string, result interface{}) error { return nil }
