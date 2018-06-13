@@ -206,6 +206,11 @@ func NewMongoDriver(addr string) (Meta, error) {
 		return nil, fmt.Errorf("invalid host")
 	}
 	var fullAddr = adrs.Hostname() + ":" + adrs.Port()
+	if nil != adrs.User {
+		usr := adrs.User
+		fullAddr = usr.String() + "@" + fullAddr
+	}
+
 	session, err := mgo.DialWithTimeout(fullAddr, time.Second*5)
 	if nil != err {
 		return nil, err
