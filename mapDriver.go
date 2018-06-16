@@ -20,6 +20,7 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
+func (d *mapDriver) Cursor() Cursor { return DummyCursor{} }
 func (m *mapDriver) DB(name string) error {
 	if name == "" {
 		return fmt.Errorf("empty name")
