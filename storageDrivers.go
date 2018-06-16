@@ -66,7 +66,7 @@ type Cursor interface {
 	One(Doc interface{}) error
 	Limit(num int) Cursor
 	Skip(num int) Cursor
-	All(Doc *[]interface{}) error
+	All(Doc interface{}) error
 	Count(num *int) error
 	Distinct(key string, result interface{}) error
 }
@@ -79,6 +79,6 @@ func (d DummyCursor) Sort(Doc ...string) Cursor                     { return d }
 func (d DummyCursor) One(Doc interface{}) error                     { return nil }
 func (d DummyCursor) Limit(num int) Cursor                          { return d }
 func (d DummyCursor) Skip(num int) Cursor                           { return d }
-func (d DummyCursor) All(Doc *[]interface{}) error                  { return nil }
+func (d DummyCursor) All(Doc interface{}) error                     { return nil }
 func (d DummyCursor) Count(num *int) error                          { return nil }
 func (d DummyCursor) Distinct(key string, result interface{}) error { return nil }

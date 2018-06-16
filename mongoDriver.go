@@ -127,7 +127,7 @@ func (d *mongoDriver) Count(num *int) error {
 	return err
 }
 
-func (d *mongoDriver) All(Doc *[]interface{}) error {
+func (d *mongoDriver) All(Doc interface{}) error {
 	q := getQuery(d.cursor.and, d.cursor.or)
 	d.cursor.q = d.col.Find(q)
 	for _, fn := range d.cursor.queue {
