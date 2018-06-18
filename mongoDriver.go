@@ -51,7 +51,34 @@ func (d *mongoDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
-
+func (d *mongoDriver) Lt(Doc Document) Document {
+	var newDoc = make(Document)
+	for k, v := range Doc {
+		newDoc[k] = Document{"$lt": v}
+	}
+	return newDoc
+}
+func (d *mongoDriver) Lte(Doc Document) Document {
+	var newDoc = make(Document)
+	for k, v := range Doc {
+		newDoc[k] = Document{"$lte": v}
+	}
+	return newDoc
+}
+func (d *mongoDriver) Gte(Doc Document) Document {
+	var newDoc = make(Document)
+	for k, v := range Doc {
+		newDoc[k] = Document{"$gte": v}
+	}
+	return newDoc
+}
+func (d *mongoDriver) Gt(Doc Document) Document {
+	var newDoc = make(Document)
+	for k, v := range Doc {
+		newDoc[k] = Document{"$gt": v}
+	}
+	return newDoc
+}
 func (d *mongoDriver) Cursor() Cursor {
 	d.cursor = new(crs)
 	d.cursor.and = bson.M{}

@@ -56,6 +56,10 @@ type (
 		Inserter
 		Remover
 		Cursor() Cursor
+		Lt(Doc Document) Document
+		Gt(Doc Document) Document
+		Gte(Doc Document) Document
+		Lte(Doc Document) Document
 	}
 )
 type Cursor interface {

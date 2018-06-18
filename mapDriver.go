@@ -20,7 +20,11 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
-func (d *mapDriver) Cursor() Cursor { return DummyCursor{} }
+func (d *mapDriver) Gt(Doc Document) Document  { return nil }
+func (d *mapDriver) Gte(Doc Document) Document { return nil }
+func (d *mapDriver) Lt(Doc Document) Document  { return nil }
+func (d *mapDriver) Lte(Doc Document) Document { return nil }
+func (d *mapDriver) Cursor() Cursor            { return DummyCursor{} }
 func (m *mapDriver) DB(name string) error {
 	if name == "" {
 		return fmt.Errorf("empty name")
