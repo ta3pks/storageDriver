@@ -20,11 +20,15 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
-func (d *mapDriver) Gt(Doc Document) Document  { return nil }
-func (d *mapDriver) Gte(Doc Document) Document { return nil }
-func (d *mapDriver) Lt(Doc Document) Document  { return nil }
-func (d *mapDriver) Lte(Doc Document) Document { return nil }
-func (d *mapDriver) Cursor() Cursor            { return DummyCursor{} }
+func (d *mapDriver) Gt(Doc Document) Document                           { return nil }
+func (d *mapDriver) Gte(Doc Document) Document                          { return nil }
+func (d *mapDriver) Lt(Doc Document) Document                           { return nil }
+func (d *mapDriver) Lte(Doc Document) Document                          { return nil }
+func (d *mapDriver) In(key string, values []interface{}) Document       { return nil }
+func (d *mapDriver) Between(key string, values [2]interface{}) Document { return nil }
+func (d *mapDriver) Not(Doc Document) Document                          { return nil }
+func (d *mapDriver) Regex(key string, value string) Document            { return nil }
+func (d *mapDriver) Cursor() Cursor                                     { return DummyCursor{} }
 func (m *mapDriver) DB(name string) error {
 	if name == "" {
 		return fmt.Errorf("empty name")
@@ -207,6 +211,7 @@ func (d *mapDriver) Remove(Query Document) error {
 }
 
 func NewMapDriver() Meta {
+	fmt.Println("!MapDriver has been deprecated and will be removed in the future releases of storageDriver please use other in memory driver alternatives like ql driver")
 	var driver = new(mapDriver)
 	driver.store = make(map[string]map[string][]Document)
 	return driver

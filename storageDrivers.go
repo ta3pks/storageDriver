@@ -60,6 +60,10 @@ type (
 		Gt(Doc Document) Document
 		Gte(Doc Document) Document
 		Lte(Doc Document) Document
+		In(key string, values []interface{}) Document
+		Between(key string, values [2]interface{}) Document
+		Not(Doc Document) Document
+		Regex(key string, value string) Document
 	}
 )
 type Cursor interface {

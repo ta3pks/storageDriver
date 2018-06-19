@@ -79,6 +79,22 @@ func (d *mongoDriver) Gt(Doc Document) Document {
 	}
 	return newDoc
 }
+func (d *mongoDriver) In(key string, values []interface{}) Document {
+	return Document{key: Document{"$in": values}}
+}
+func (d *mongoDriver) Between(key string, values [2]interface{}) Document {
+	return Document{key: Document{"$gte": values[0], "$lte": values[1]}}
+}
+func (d *mongoDriver) Not(Doc Document) Document {
+	var newDoc = make(Document)
+	for k, v := range Doc {
+		newDoc[k] = Document{"$ne": v}
+	}
+	return newDoc
+}
+func (d *mongoDriver) Regex(key, value string) Document {
+	return Document{key: Document{"$regex": value}}
+}
 func (d *mongoDriver) Cursor() Cursor {
 	d.cursor = new(crs)
 	d.cursor.and = bson.M{}
