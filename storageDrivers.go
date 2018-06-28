@@ -55,6 +55,7 @@ type (
 		Updater
 		Inserter
 		Remover
+		AggregateMongo([]map[string]interface{}) ([]Document, error)
 		Cursor() Cursor
 		Lt(Doc Document) Document
 		Gt(Doc Document) Document

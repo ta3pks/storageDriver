@@ -51,6 +51,11 @@ func (d *mongoDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
+func (d *mongoDriver) AggregateMongo(doc []Document) ([]Document, error) {
+	var dc = make([]Document, 0)
+	err := d.col.Pipe(doc).All(&dc)
+	return dc, err
+}
 func (d *mongoDriver) Lt(Doc Document) Document {
 	var newDoc = make(Document)
 	for k, v := range Doc {
