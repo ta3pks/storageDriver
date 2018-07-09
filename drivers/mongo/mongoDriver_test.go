@@ -1,34 +1,19 @@
-package storageDriver
+package mongo
 
-import "testing"
+import (
+	"testing"
 
-var Driver *mongoDriver
+	"github.com/nikosEfthias/storageDriver"
+)
 
-func TestNewMongoDriver(t *testing.T) {
-	m, err := NewMongoDriver("mongodb://localhost:27017")
-	if nil == err && nil == m {
-		t.Fatal("both error and the meta cannot be null")
-	}
-	if nil != err {
-		t.Fatal(err)
-	}
-	m, err = NewMongoDriver("mongodb://localhost:27017/test")
-	if nil == m || nil != err {
-		t.Fatal("cannot handle the path", err)
-	}
-
-	m, err = NewMongoDriver("localhost:27017/test")
-	if nil != m || nil == err {
-		t.Fatal("missing protocol is supposed to give an error", err)
-	}
-}
+var driver *mongoDriver
 
 func TestDB(t *testing.T) {
-	var m Meta = new(mongoDriver)
+	var m storageDriver.Meta = new(mongoDriver)
 	if nil == m.DB("test") {
 		t.Fatal("error cannot be nil while theres no session")
 	}
-	m, err := NewMongoDriver("mongodb://localhost:27017")
+	m, err := m.(*mongoDriver).Connect("mongodb://localhost:27017")
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -42,11 +27,11 @@ func TestDB(t *testing.T) {
 }
 
 func TestTable(t *testing.T) {
-	var m Meta = new(mongoDriver)
+	var m storageDriver.Meta = new(mongoDriver)
 	if nil == m.Table("test") {
 		t.Fatal("error cannot be nil while theres no session and db")
 	}
-	m, err := NewMongoDriver("mongodb://localhost:27017")
+	m, err := m.(*mongoDriver).Connect("mongodb://localhost:27017")
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -66,7 +51,8 @@ func TestTable(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
-	m, err := NewMongoDriver("mongodb://localhost:27017")
+	_m := new(mongoDriver)
+	m, err := _m.Connect("mongodb://localhost:27017")
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -77,7 +63,8 @@ func TestClone(t *testing.T) {
 }
 
 func TestDriver(t *testing.T) {
-	m, err := NewMongoDriver("mongodb://localhost:27017")
+	_m := new(mongoDriver)
+	m, err := _m.Connect("mongodb://localhost:27017")
 	_, err = m.Driver()
 	if nil == err {
 		t.Fatal("there must be an error here")
@@ -100,20 +87,20 @@ func TestDriver(t *testing.T) {
 
 func TestInsert(t *testing.T) {
 	var d = getCleanDb()
-	if err := d.Insert(Document{"name": "nikos"}); nil != err {
+	if err := d.Insert(storageDriver.Document{"name": "nikos"}); nil != err {
 		t.Fatal(err)
 	}
-	var data = make(Document)
-	err := d.(*mongoDriver).col.Find(Document{"name": "nikos"}).One(data)
+	var data = make(storageDriver.Document)
+	err := d.(*mongoDriver).col.Find(storageDriver.Document{"name": "nikos"}).One(data)
 	if nil != err {
 		t.Fatal(err)
 	}
 }
 
 func TestInsertMulti(t *testing.T) {
-	var data = make([]Document, 100)
+	var data = make([]storageDriver.Document, 100)
 	for i := range data {
-		data[i] = Document{"num": i, "key": "key"}
+		data[i] = storageDriver.Document{"num": i, "key": "key"}
 	}
 
 	d := getCleanDb()
@@ -122,8 +109,8 @@ func TestInsertMulti(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var allData = make([]Document, 0)
-	err = d.(*mongoDriver).col.Find(Document{"key": "key"}).All(&allData)
+	var allData = make([]storageDriver.Document, 0)
+	err = d.(*mongoDriver).col.Find(storageDriver.Document{"key": "key"}).All(&allData)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -132,8 +119,9 @@ func TestInsertMulti(t *testing.T) {
 		t.Fatal("invalid data")
 	}
 }
-func getCleanDb() StorageDriver {
-	d, err := NewMongoDriver("mongodb://localhost:27017")
+func getCleanDb() storageDriver.Driver {
+	_m := new(mongoDriver)
+	d, err := _m.Connect("mongodb://localhost:27017")
 	if nil != err {
 		panic(err)
 	}

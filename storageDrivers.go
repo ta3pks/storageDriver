@@ -1,11 +1,49 @@
 package storageDriver
 
-import "io"
+import (
+	"fmt"
+	"io"
+	"sync"
+)
 
 type (
 	//Document is general data structure where keys are string and values are anything you want as long as the underlaying driver supports it
 	Document = map[string]interface{}
 )
+type ERRNO int
+
+const (
+	E_SUCCESS ERRNO = iota
+	E_EXISTS
+)
+
+var drivers = map[string]Connector{}
+var dlock sync.Mutex
+
+func Register(name string, driver Connector) ERRNO {
+	dlock.Lock()
+	defer dlock.Unlock()
+	_, ok := drivers[name]
+	if ok {
+		return E_EXISTS
+	}
+	drivers[name] = driver
+	return E_SUCCESS
+}
+func Open(name, addr string) (Meta, error) {
+	dlock.Lock()
+	defer dlock.Unlock()
+	c, ok := drivers[name]
+	if !ok {
+		return nil, fmt.Errorf("driver is not registered")
+	}
+
+	return c.Connect(addr)
+}
+
+type Connector interface {
+	Connect(addr string) (Meta, error)
+}
 
 //Meta contains the metaData
 type Meta interface {
@@ -16,7 +54,7 @@ type Meta interface {
 	//Clone returns a copy of previous meta which uses the same underlaying connection in most cases
 	Clone() Meta
 	//Driver returns the actual driver which can be later queried
-	Driver() (StorageDriver, error)
+	Driver() (Driver, error)
 }
 type (
 	//Saver inserts or updates data
@@ -49,7 +87,7 @@ type (
 	Remover interface {
 		Remove(Query Document) error
 	}
-	StorageDriver interface {
+	Driver interface {
 		Saver
 		Getter
 		Updater
