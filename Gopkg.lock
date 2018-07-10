@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
+  version = "v1.0.1"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/mgo.v2"
   packages = [
@@ -16,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "41f9d12acacd972a6d5b43caff1b9f4e610755e82d23b406d5dc174da9bedf0a"
+  inputs-digest = "8dc26a768a1580b4db3d38e1f9283e87f0307f1087bc3048536fe59cd0bb06d0"
   solver-name = "gps-cdcl"
   solver-version = 1
