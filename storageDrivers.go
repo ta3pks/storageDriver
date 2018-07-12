@@ -44,6 +44,8 @@ func Open(name, addr string) (Meta, error) {
 type Connector interface {
 	Connect(addr string) (Meta, error)
 }
+type GroupOptions struct {
+}
 
 //Meta contains the metaData
 type Meta interface {
@@ -65,7 +67,6 @@ type (
 	Getter interface {
 		Get(Query Document) ([]Document, error)
 		GetOne(Query Document) (Document, error)
-		Custom(Query interface{}) ([]Document, error)
 	}
 	//Updater updates the data and returns the updated document.
 	//If there are no documents to update returns an error
@@ -87,13 +88,21 @@ type (
 	Remover interface {
 		Remove(Query Document) error
 	}
+	Aggregator interface {
+		Group(*GroupOptions) Aggregator
+		Select(Document) Aggregator
+		Limit(int) Aggregator
+		Skip(int) Aggregator
+		Project(Document) Aggregator
+		Exec(interface{}) error
+	}
 	Driver interface {
 		Saver
 		Getter
 		Updater
 		Inserter
 		Remover
-		AggregateMongo([]map[string]interface{}) ([]Document, error)
+		Aggregate() Aggregator
 		Cursor() Cursor
 		Lt(Doc Document) Document
 		Gt(Doc Document) Document
@@ -117,15 +126,3 @@ type Cursor interface {
 	Count(num *int) error
 	Distinct(key string, result interface{}) error
 }
-type DummyCursor struct{}
-
-func (d DummyCursor) And(Doc Document) Cursor                       { return d }
-func (d DummyCursor) Or([]interface{}) Cursor                       { return d }
-func (d DummyCursor) Select(fieldNames ...string) Cursor            { return d }
-func (d DummyCursor) Sort(Doc ...string) Cursor                     { return d }
-func (d DummyCursor) One(Doc interface{}) error                     { return nil }
-func (d DummyCursor) Limit(num int) Cursor                          { return d }
-func (d DummyCursor) Skip(num int) Cursor                           { return d }
-func (d DummyCursor) All(Doc interface{}) error                     { return nil }
-func (d DummyCursor) Count(num *int) error                          { return nil }
-func (d DummyCursor) Distinct(key string, result interface{}) error { return nil }
