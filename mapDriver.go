@@ -186,8 +186,6 @@ func (d *mapDriver) Save(Query, Doc Document) error {
 		return d.Insert(dd)
 	}
 	return d.Update(doc, Doc)
-
-	return nil
 }
 func (d *mapDriver) Remove(Query Document) error {
 	if _, ok := d.store[d.database]; !ok {
