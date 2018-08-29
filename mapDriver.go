@@ -20,6 +20,10 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 	}
 	return d, nil
 }
+
+func (d *mapDriver) AggregateMongo(doc []Document) ([]Document, error) {
+	return nil, fmt.Errorf("not implemented")
+}
 func (d *mapDriver) Gt(Doc Document) Document                           { return nil }
 func (d *mapDriver) Gte(Doc Document) Document                          { return nil }
 func (d *mapDriver) Lt(Doc Document) Document                           { return nil }
@@ -182,8 +186,6 @@ func (d *mapDriver) Save(Query, Doc Document) error {
 		return d.Insert(dd)
 	}
 	return d.Update(doc, Doc)
-
-	return nil
 }
 func (d *mapDriver) Remove(Query Document) error {
 	if _, ok := d.store[d.database]; !ok {
