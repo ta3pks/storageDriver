@@ -24,15 +24,15 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 func (d *mapDriver) AggregateMongo(doc []Document) ([]Document, error) {
 	return nil, fmt.Errorf("not implemented")
 }
-func (d *mapDriver) Gt(Doc Document) Document                           { return nil }
-func (d *mapDriver) Gte(Doc Document) Document                          { return nil }
-func (d *mapDriver) Lt(Doc Document) Document                           { return nil }
-func (d *mapDriver) Lte(Doc Document) Document                          { return nil }
-func (d *mapDriver) In(key string, values []interface{}) Document       { return nil }
-func (d *mapDriver) Between(key string, values [2]interface{}) Document { return nil }
-func (d *mapDriver) Not(Doc Document) Document                          { return nil }
-func (d *mapDriver) Regex(key string, value string) Document            { return nil }
-func (d *mapDriver) Cursor() Cursor                                     { return DummyCursor{} }
+func (d *mapDriver) Gt(Doc Document) Document                                { return nil }
+func (d *mapDriver) Gte(Doc Document) Document                               { return nil }
+func (d *mapDriver) Lt(Doc Document) Document                                { return nil }
+func (d *mapDriver) Lte(Doc Document) Document                               { return nil }
+func (d *mapDriver) In(key string, values []interface{}) Document            { return nil }
+func (d *mapDriver) Between(key string, values [2]interface{}) Document      { return nil }
+func (d *mapDriver) Not(Doc Document) Document                               { return nil }
+func (d *mapDriver) Regex(key string, value string, options string) Document { return nil }
+func (d *mapDriver) Cursor() Cursor                                          { return DummyCursor{} }
 func (m *mapDriver) DB(name string) error {
 	if name == "" {
 		return fmt.Errorf("empty name")

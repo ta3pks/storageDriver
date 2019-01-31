@@ -97,8 +97,8 @@ func (d *mongoDriver) Not(Doc Document) Document {
 	}
 	return newDoc
 }
-func (d *mongoDriver) Regex(key, value string) Document {
-	return Document{key: Document{"$regex": value}}
+func (d *mongoDriver) Regex(key, value string, options string) Document {
+	return Document{key: Document{"$regex": value, "$options": options}}
 }
 func (d *mongoDriver) Cursor() Cursor {
 	d.cursor = new(crs)
