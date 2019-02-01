@@ -212,6 +212,36 @@ func (d *mapDriver) Remove(Query Document) error {
 	return fmt.Errorf("no document removed")
 }
 
+func (d *mapDriver) RemoveAll(Query Document) error {
+	if _, ok := d.store[d.database]; !ok {
+		d.store[d.database] = make(map[string][]Document)
+	}
+	var match bool = true
+	d.Lock()
+	for docIndex, DBDoc := range d.store[d.database][d.collection] {
+
+		for k, v := range Query {
+			if val, ok := DBDoc[k]; !ok || !reflect.DeepEqual(val, v) {
+				match = false
+				goto next
+			}
+		}
+
+		if match {
+			d.store[d.database][d.collection] = append(d.store[d.database][d.collection][:docIndex], d.store[d.database][d.collection][docIndex+1:]...)
+
+			d.Unlock()
+			d.RemoveAll(Query)
+			return nil
+		}
+	next:
+		match = true
+	}
+
+	d.Unlock()
+	return fmt.Errorf("no document removed")
+}
+
 func NewMapDriver() Meta {
 	fmt.Println("!MapDriver has been deprecated and will be removed in the future releases of storageDriver please use other in memory driver alternatives like ql driver")
 	var driver = new(mapDriver)
