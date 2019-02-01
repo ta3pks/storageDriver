@@ -48,6 +48,7 @@ type (
 	// Remover removes the document and returns an error if cannot remove
 	Remover interface {
 		Remove(Query Document) error
+		RemoveAll(Query Document) error
 	}
 	StorageDriver interface {
 		Saver

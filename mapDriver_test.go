@@ -144,3 +144,23 @@ func Test_Remove(t *testing.T) {
 		t.Fatal("remove doesnt remove values")
 	}
 }
+
+func Test_RemoveAll(t *testing.T) {
+
+	d.store = make(map[string]map[string][]Document)
+	for i := 0; i < 500; i++ {
+		d.Insert(Document{"num": i})
+		d.Insert(Document{"num": i + 1})
+		d.Insert(Document{"num": i + 2})
+	}
+
+	err := d.RemoveAll(Document{"num": 10})
+	if nil != err {
+		t.Fatal("remove unsuccessful", err)
+	}
+
+	_, err = d.Get(Document{"num": 10})
+	if nil == err {
+		t.Fatal("remove doesnt remove values")
+	}
+}

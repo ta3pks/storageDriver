@@ -245,6 +245,12 @@ func (d *mongoDriver) InsertMultiNoFail(docs []Document, ErrorOut ...io.Writer) 
 func (d *mongoDriver) Remove(query Document) error {
 	return d.col.Remove(query)
 }
+
+func (d *mongoDriver) RemoveAll(query Document) error {
+	_, err := d.col.RemoveAll(query)
+	return err
+}
+
 func NewMongoDriver(addr string) (Meta, error) {
 	adrs, err := url.Parse(addr)
 	if nil != err {
