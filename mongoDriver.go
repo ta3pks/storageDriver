@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"sync"
 	"time"
 
 	"gopkg.in/mgo.v2"
@@ -13,6 +14,7 @@ import (
 var defaultSession *mgo.Session
 
 type crs struct {
+	sync.Mutex
 	or    []interface{}
 	and   bson.M
 	queue []func()
@@ -97,17 +99,20 @@ func (d *mongoDriver) Not(Doc Document) Document {
 	}
 	return newDoc
 }
-func (d *mongoDriver) Regex(key, value string) Document {
-	return Document{key: Document{"$regex": value}}
+func (d *mongoDriver) Regex(key, value string, options string) Document {
+	return Document{key: Document{"$regex": value, "$options": options}}
 }
 func (d *mongoDriver) Cursor() Cursor {
 	d.cursor = new(crs)
 	d.cursor.and = bson.M{}
 	d.cursor.or = make([]interface{}, 0)
 	d.cursor.queue = make([]func(), 0)
+	d.cursor.q = new(mgo.Query)
 	return d
 }
 func (d *mongoDriver) And(Doc Document) Cursor {
+	d.cursor.Lock()
+	defer d.cursor.Unlock()
 	for k, v := range Doc {
 		d.cursor.and[k] = v
 	}
@@ -245,6 +250,12 @@ func (d *mongoDriver) InsertMultiNoFail(docs []Document, ErrorOut ...io.Writer) 
 func (d *mongoDriver) Remove(query Document) error {
 	return d.col.Remove(query)
 }
+
+func (d *mongoDriver) RemoveAll(query Document) error {
+	_, err := d.col.RemoveAll(query)
+	return err
+}
+
 func NewMongoDriver(addr string) (Meta, error) {
 	adrs, err := url.Parse(addr)
 	if nil != err {
@@ -268,6 +279,7 @@ func NewMongoDriver(addr string) (Meta, error) {
 	}, nil
 }
 func getQuery(and Document, or []interface{}) Document {
+
 	if len(or) > 0 {
 		and["$or"] = or
 	}

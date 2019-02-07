@@ -24,15 +24,15 @@ func (d *mapDriver) Driver() (StorageDriver, error) {
 func (d *mapDriver) AggregateMongo(doc []Document) ([]Document, error) {
 	return nil, fmt.Errorf("not implemented")
 }
-func (d *mapDriver) Gt(Doc Document) Document                           { return nil }
-func (d *mapDriver) Gte(Doc Document) Document                          { return nil }
-func (d *mapDriver) Lt(Doc Document) Document                           { return nil }
-func (d *mapDriver) Lte(Doc Document) Document                          { return nil }
-func (d *mapDriver) In(key string, values []interface{}) Document       { return nil }
-func (d *mapDriver) Between(key string, values [2]interface{}) Document { return nil }
-func (d *mapDriver) Not(Doc Document) Document                          { return nil }
-func (d *mapDriver) Regex(key string, value string) Document            { return nil }
-func (d *mapDriver) Cursor() Cursor                                     { return DummyCursor{} }
+func (d *mapDriver) Gt(Doc Document) Document                                { return nil }
+func (d *mapDriver) Gte(Doc Document) Document                               { return nil }
+func (d *mapDriver) Lt(Doc Document) Document                                { return nil }
+func (d *mapDriver) Lte(Doc Document) Document                               { return nil }
+func (d *mapDriver) In(key string, values []interface{}) Document            { return nil }
+func (d *mapDriver) Between(key string, values [2]interface{}) Document      { return nil }
+func (d *mapDriver) Not(Doc Document) Document                               { return nil }
+func (d *mapDriver) Regex(key string, value string, options string) Document { return nil }
+func (d *mapDriver) Cursor() Cursor                                          { return DummyCursor{} }
 func (m *mapDriver) DB(name string) error {
 	if name == "" {
 		return fmt.Errorf("empty name")
@@ -209,6 +209,36 @@ func (d *mapDriver) Remove(Query Document) error {
 		match = true
 	}
 
+	return fmt.Errorf("no document removed")
+}
+
+func (d *mapDriver) RemoveAll(Query Document) error {
+	if _, ok := d.store[d.database]; !ok {
+		d.store[d.database] = make(map[string][]Document)
+	}
+	var match bool = true
+	d.Lock()
+	for docIndex, DBDoc := range d.store[d.database][d.collection] {
+
+		for k, v := range Query {
+			if val, ok := DBDoc[k]; !ok || !reflect.DeepEqual(val, v) {
+				match = false
+				goto next
+			}
+		}
+
+		if match {
+			d.store[d.database][d.collection] = append(d.store[d.database][d.collection][:docIndex], d.store[d.database][d.collection][docIndex+1:]...)
+
+			d.Unlock()
+			d.RemoveAll(Query)
+			return nil
+		}
+	next:
+		match = true
+	}
+
+	d.Unlock()
 	return fmt.Errorf("no document removed")
 }
 

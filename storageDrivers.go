@@ -48,6 +48,7 @@ type (
 	// Remover removes the document and returns an error if cannot remove
 	Remover interface {
 		Remove(Query Document) error
+		RemoveAll(Query Document) error
 	}
 	StorageDriver interface {
 		Saver
@@ -64,7 +65,7 @@ type (
 		In(key string, values []interface{}) Document
 		Between(key string, values [2]interface{}) Document
 		Not(Doc Document) Document
-		Regex(key string, value string) Document
+		Regex(key string, value string, options string) Document
 	}
 )
 type Cursor interface {
