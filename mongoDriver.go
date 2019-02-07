@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"sync"
 	"time"
 
 	"gopkg.in/mgo.v2"
@@ -13,6 +14,7 @@ import (
 var defaultSession *mgo.Session
 
 type crs struct {
+	sync.Mutex
 	or    []interface{}
 	and   bson.M
 	queue []func()
@@ -108,6 +110,8 @@ func (d *mongoDriver) Cursor() Cursor {
 	return d
 }
 func (d *mongoDriver) And(Doc Document) Cursor {
+	d.cursor.Lock()
+	defer d.cursor.Unlock()
 	for k, v := range Doc {
 		d.cursor.and[k] = v
 	}
@@ -274,6 +278,7 @@ func NewMongoDriver(addr string) (Meta, error) {
 	}, nil
 }
 func getQuery(and Document, or []interface{}) Document {
+
 	if len(or) > 0 {
 		and["$or"] = or
 	}
