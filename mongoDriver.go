@@ -107,6 +107,7 @@ func (d *mongoDriver) Cursor() Cursor {
 	d.cursor.and = bson.M{}
 	d.cursor.or = make([]interface{}, 0)
 	d.cursor.queue = make([]func(), 0)
+	d.cursor.q = new(mgo.Query)
 	return d
 }
 func (d *mongoDriver) And(Doc Document) Cursor {
